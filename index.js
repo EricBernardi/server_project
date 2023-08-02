@@ -1,10 +1,21 @@
 import jsonwebtoken from "jsonwebtoken";
 import express from "express";
-import bcrypt, { hash } from "bcrypt";
-import e from "express";
+import bcrypt from "bcrypt";
+import DB from "./db.js";
+import Users from "./Models/users.js";
+
 
 const server = express();
 const port = 3000;
+let users = new Array<Users>[];
+
+const database = new DB();
+
+database.con.query("SELECT * FROM user_login", (err, result, fields) => {
+  if (err) throw err;
+  users = result;
+});
+
 server.use(express.json());
 
 server.use((req, res, next) => {
@@ -129,5 +140,7 @@ server.delete("/cursos/:index", (req, res) => {
 });
 
 server.listen(port, () => {
-  console.log(`Servidor está rodando na porta ${port}...`);
+  console.log(
+    `Servidor está rodando na porta ${port}... http://localhost:3000`
+  );
 });
