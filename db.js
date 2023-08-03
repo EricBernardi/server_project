@@ -1,19 +1,19 @@
 import mysql from "mysql2";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 dotenv.config();
 
 class DB {
   constructor() {
     this.con = mysql.createConnection({
-        host: "localhost",
-        user: "root",
-        password: process.env.DATABASE_PASSWORD,
-        database: "users",
-      });
+      host: "localhost",
+      user: "root",
+      password: process.env.DATABASE_PASSWORD,
+      database: "users",
+    });
   }
 
-    handleDisconnect() {
+  handleDisconnect() {
     this.con.connect((err) => {
       if (err) {
         console.error("error when connecting to db:", err);
@@ -31,7 +31,7 @@ class DB {
     });
   }
 
- async getUsers(){
+  async getUsers() {
     return new Promise((resolve, reject) => {
       this.con.query("SELECT * FROM user_login", (err, result, fields) => {
         if (err) reject(err);
@@ -40,12 +40,23 @@ class DB {
     });
   }
 
-  async getCourses(){
+  async getCourses() {
     return new Promise((resolve, reject) => {
       this.con.query("SELECT * FROM courses", (err, result, fields) => {
         if (err) reject(err);
         resolve(result);
       });
+    });
+  }
+
+  async setCourses(courseName, courseDetail) {
+    return new Promise((resolve, reject) => {
+      this.sql = `INSERT INTO courses (course_name, course_detail) VALUES ("${courseName}", "${courseDetail}")`;
+      this.con.query(this.sql, (err, result) => {
+          if (err) reject(err);
+            resolve(result);
+        }
+      );
     })
   }
 }

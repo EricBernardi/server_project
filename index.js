@@ -2,8 +2,8 @@ import jsonwebtoken from "jsonwebtoken";
 import express from "express";
 import bcrypt from "bcrypt";
 import DB from "./db.js";
-import User from "./Models/user.js";
-import Course from "./Models/course.js";
+import User from "./Models/User.js";
+import Course from "./Models/Course.js";
 import dotenv from 'dotenv';
 
 
@@ -20,6 +20,7 @@ database.getUsers().then((response) => {
 });
 database.getCourses().then((response) => {
   courses = response;
+  console.log(courses);
 });
 
 server.use(express.json());
