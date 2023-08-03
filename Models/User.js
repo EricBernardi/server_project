@@ -1,4 +1,4 @@
-class Users {
+class User {
     constructor(id, username, login_user, password){
         this.id = id;
         this.username = username;
@@ -7,4 +7,4 @@ class Users {
     }
 }
 
-export default Users;
+export default User;
