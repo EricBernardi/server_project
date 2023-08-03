@@ -2,18 +2,24 @@ import jsonwebtoken from "jsonwebtoken";
 import express from "express";
 import bcrypt from "bcrypt";
 import DB from "./db.js";
-import Users from "./Models/users.js";
+import User from "./Models/user.js";
+import Course from "./Models/course.js";
+import dotenv from 'dotenv';
 
 
+dotenv.config();
 const server = express();
 const port = 3000;
-let users = new Array<Users>[];
+let users = new Array<User>[];
+let courses = new Array<Course>[];
 
 const database = new DB();
 
-database.con.query("SELECT * FROM user_login", (err, result, fields) => {
-  if (err) throw err;
-  users = result;
+database.getUsers().then((response) => {
+  users = response;
+});
+database.getCourses().then((response) => {
+  courses = response;
 });
 
 server.use(express.json());
@@ -48,10 +54,7 @@ server.post("/login", (req, res) => {
   // })
 
   try {
-    const hashFromDatabase =
-      "$2b$10$G4gvOGYTVXf0CXJyZt9s6.6jWlCtcsY/lHbmFVnDzb1KUdXN17m56";
-
-    bcrypt.compare(password, hashFromDatabase, function (err, result) {
+    bcrypt.compare(password, hashPassword, function (err, result) {
       if (err) {
         console.log("Erro ao comparar as senhas: ", err);
         return res.status(500).send("Ocorreu um erro", err);
@@ -59,7 +62,7 @@ server.post("/login", (req, res) => {
         if (username === "Teste" && result) {
           const token = jsonwebtoken.sign(
             { user: JSON.stringify(username) },
-            "hgs%4$54!@#ASD",
+            process.env.KEY_TO_ENCRYPT_PASSWORDS,
             { expiresIn: "60m" }
           );
           console.log(token);
@@ -73,29 +76,6 @@ server.post("/login", (req, res) => {
     return res.status(500).send(error);
   }
 });
-
-// server.use("*", auth.tokenValited);
-
-const cursos = [
-  {
-    id: 1,
-    curso: "Java",
-    detalhes:
-      "Java é uma linguagem de programação e plataforma de computação liberada pela primeira vez pela Sun Microsystems em 1995. De um início humilde, ela evoluiu para uma grande participação no mundo digital dos dias atuais, oferecendo a plataforma confiável na qual muitos serviços e aplicativos são desenvolvidos.",
-  },
-  {
-    id: 2,
-    curso: "C#",
-    detalhes:
-      "C# é uma linguagem de programação orientada a objetos e orientada a componentes. C# fornece construções de linguagem para dar suporte diretamente a esses conceitos, tornando C# uma linguagem natural para criação e uso de componentes de software.",
-  },
-  {
-    id: 3,
-    curso: "PHP",
-    detalhes:
-      "O PHP (um acrônimo recursivo para PHP: Hypertext Preprocessor ) é uma linguagem de script open source de uso geral, muito utilizada, e especialmente adequada para o desenvolvimento web e que pode ser embutida dentro do HTML.",
-  },
-];
 
 server.get("/", (req, res) => {
   try {
